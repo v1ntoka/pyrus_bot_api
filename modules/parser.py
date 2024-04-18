@@ -1,26 +1,52 @@
-import requests
-from auth import Authorisation
+from auth import Client
 import json
 
 
-class Forms:
-    def __init__(self, ) -> None:
-        self.headers = Authorisation().headers
-        url = "https://pyrus.sovcombank.ru/api/v4/forms/{form_id}/"
+class GetTasksError(Exception):
+    ...
+
+
+class Parser(Client):
+    def __init__(self, env_path: str | None = None, default_form_id: int | str = 307143) -> None:
+        super().__init__(env_path=env_path, default_form_id=default_form_id)
+        try:
+            self.form_tasks = self.get_tasks_by_form()["tasks"]
+        except KeyError:
+            raise GetTasksError(
+                f"Не удалось получить задачи с id {self.default_form_id}")
+        self.objects_set = self.__get_objects_set()
+
+    def __get_objects_set(self) -> set:
+        result = set()
+        for task in self.form_tasks:
+            result.add(self.__get_object_name(task))
+        return result
+
+    def __get_object_name(self, task: dict) -> str | None:
+        for field in task["fields"]:
+            if field.get("id") == 35:
+                try:
+                    return field["value"]["values"][3] + ' / ' + field["value"]["values"][4]
+                except KeyError:
+                    return None
+
+    def __get_first_line_problem(self, task: dict) -> str | None:
+        ...
+
+
+def to_json(task: dict) -> None:
+    with open("output.json", 'w', encoding="utf-8") as output:
+        json.dump(task, output, ensure_ascii=False)
 
 
 def main():
-    f = Forms()
-    headers = f.headers
-    url = "https://pyrus.sovcombank.ru/api/v4/forms/{form_id}/register".format(
-        form_id=307143)
-    # url = "https://pyrus.sovcombank.ru/api/v4/forms"
-    response = json.loads(requests.get(
-        url=url, headers=headers, params={"include_archived": "y", "": ""}).text)
-    with open("output.json", 'w', encoding="utf-8") as output:
-        json.dump(response["tasks"], output, ensure_ascii=False)
-
-    print(len(response["tasks"]))
+    prs = Parser()
+    # for task in prs.form_tasks:
+    #     for field in task["fields"]:
+    #         if field["id"] == 40:
+    #             to_json(field)
+    #             break
+    to_json(prs.get_catalog()["items"])
 
 
 if __name__ == "__main__":
