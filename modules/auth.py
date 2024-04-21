@@ -15,9 +15,9 @@ class Client:
         load_dotenv(env_path)
         self.default_form_id = default_form_id
         self.default_tasks_fields = {
-            # "field_ids": [35, ],
+            # "field_ids": [43, 44, ],
             # "fld35": "2287714",
-            "fld9": f"gt{(dt.datetime.now() - dt.timedelta(days=7)).date()}",
+            "fld43": f"gt{(dt.datetime.now() - dt.timedelta(days=7)).date()}",
             "include_archived": "y",  # закрытые
         }
         self.__api_url = os.getenv("API_URL")
@@ -62,7 +62,7 @@ class Client:
         if form_id == '':
             form_id = self.default_form_id
 
-        if fields == {}:
+        if fields == None:
             fields = self.default_tasks_fields
 
         form_url = self.__api_url + f"forms/{form_id}/register"
@@ -77,14 +77,8 @@ class Client:
 
 
 def main():
-    auth = Client()
-    response = auth.get_tasks_by_form()
-    with open("output.json", 'w', encoding="utf-8") as output:
-        try:
-            json.dump(response["tasks"][0]["fields"],
-                      output, ensure_ascii=False)
-        except:
-            print(response)
+    client = Client()
+    print(client.headers)
 
 
 if __name__ == "__main__":
