@@ -1,4 +1,4 @@
-from auth import Client
+from modules.auth import Client
 import json
 import pandas as pd
 
@@ -35,7 +35,7 @@ class Parser(Client):
             result[obj["item_id"]] = obj["values"][index]
         return result
 
-    def __get_line(self, task: dict) -> dict | None:
+    def __get_tech_line(self, task: dict) -> dict | None:
         result = {"Task_id": task["id"]}
         for field in task["fields"]:
             match field["id"]:
@@ -53,26 +53,16 @@ class Parser(Client):
         return result
 
     def tech_problems_stat(self) -> pd.DataFrame:
-        header = ["Task_id", "Object", "Problem", "Entrance"]
-        task_id, object_name, problem, entrance = [], [], [], []
-        result = []
+        data = {"Task_id": [], "Object": [], "Problem": [], "Entrance": []}
         for task in self.form_tasks:
             try:
-                result.append(self.__get_line(task))
+                for key in (tmp := self.__get_tech_line(task)):
+                    data[key].append(tmp[key])
             except KeyError:
                 continue
-        return result
+        return pd.DataFrame(data)
 
 
 def to_json(task: dict, filename: str = "output") -> None:
-    with open(filename+".json", 'w', encoding="utf-8") as output:
+    with open("output/" + filename + ".json", 'w', encoding="utf-8") as output:
         json.dump(task, output, ensure_ascii=False)
-
-
-def main():
-    prs = Parser()
-    to_json(prs.tech_problems_stat())
-
-
-if __name__ == "__main__":
-    main()

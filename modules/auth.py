@@ -74,12 +74,3 @@ class Client:
         cat_url = self.__api_url + "catalogs/" + str(cat_id)
         response = requests.get(url=cat_url, headers=self.headers)
         return json.loads(response.text)
-
-
-def main():
-    client = Client()
-    print(client.headers)
-
-
-if __name__ == "__main__":
-    main()
