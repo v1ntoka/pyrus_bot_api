@@ -1,28 +1,25 @@
 import requests
-from dotenv import load_dotenv
-import os
 import json
-import datetime as dt
+from pathlib import Path
 
 
 class AuthorisationError(Exception):
     ...
 
 
+class FormIdError(Exception):
+    ...
+
+
 class Client:
 
-    def __init__(self, env_path: str | None = None, default_form_id: int | str = 307143) -> None:
-        load_dotenv(env_path)
+    def __init__(self, config: dict, default_form_id: int | str = '',
+                 default_task_fields: dict | None = None) -> None:
         self.default_form_id = default_form_id
-        self.default_tasks_fields = {
-            # "field_ids": [43, 44, ],
-            # "fld35": "2287714",
-            "fld43": f"gt{(dt.datetime.now() - dt.timedelta(days=7)).date()}",
-            "include_archived": "y",  # закрытые
-        }
-        self.__api_url = os.getenv("API_URL")
-        self.__email = os.getenv("EMAIL_AUTH")
-        self.__security_key = os.getenv("SECURITY_KEY")
+        self.default_tasks_fields = default_task_fields if default_task_fields is not None else {}
+        self.__api_url = config["api_url"]
+        self.__email = config["email_auth"]
+        self.__security_key = config["security_key"]
         self.headers = {
             "Content-Type": "application/json"
         }
@@ -31,7 +28,7 @@ class Client:
             self.headers.update(
                 {"Authorization": f"Bearer {self.access_token}"})
         else:
-            raise AuthorisationError("Не удалось получить access token")
+            raise AuthorisationError("Cannot get the access token")
 
     def __get_token(self):
         url = self.__api_url + "auth"
@@ -46,8 +43,11 @@ class Client:
         """Метод возвращает описание формы с указанным id.
         """
 
-        if form_id == '':
-            form_id = self.default_form_id
+        if not form_id:
+            if self.default_form_id:
+                form_id = self.default_form_id
+            else:
+                raise FormIdError("Empty form_id and default_form_id")
 
         form_url = self.__api_url + "forms/" + str(form_id)
         response = requests.get(url=form_url, headers=self.headers)
@@ -59,10 +59,13 @@ class Client:
         список заполненных полей формы и маршрутизация.
         """
 
-        if form_id == '':
-            form_id = self.default_form_id
+        if not form_id:
+            if self.default_form_id:
+                form_id = self.default_form_id
+            else:
+                raise FormIdError("Empty form_id and default_form_id")
 
-        if fields == None:
+        if fields is None:
             fields = self.default_tasks_fields
 
         form_url = self.__api_url + f"forms/{form_id}/register"
@@ -74,3 +77,10 @@ class Client:
         cat_url = self.__api_url + "catalogs/" + str(cat_id)
         response = requests.get(url=cat_url, headers=self.headers)
         return json.loads(response.text)
+
+    @staticmethod
+    def get_config(config_path: str | Path = '') -> dict:
+        if not config_path:
+            config_path = Path.cwd() / "conf.json"
+        with open(config_path, 'r', encoding='utf-8') as conf:
+            return json.load(conf)

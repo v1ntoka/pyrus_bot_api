@@ -1,0 +1,17 @@
+{
+  "PYRUS": {
+    "EMAIL_AUTH": "",
+    "SECURITY_KEY": "",
+    "API_URL": ""
+  },
+  "VK_TEAMS": {
+    "CHANNELS": [
+      "",
+      "",
+      ""
+    ],
+    "TOKEN": "",
+    "URL": "",
+    "NAME": ""
+  }
+}

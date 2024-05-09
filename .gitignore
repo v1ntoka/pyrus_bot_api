@@ -1,6 +1,10 @@
 .env
 venv
 __pycache__
-*.json
 *.csv
 output
+build/
+dist/
+*.spec
+scripts/tech_stat_bot/conf.json
+.idea
