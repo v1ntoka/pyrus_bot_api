@@ -1,17 +1,17 @@
 {
-  "PYRUS": {
-    "EMAIL_AUTH": "",
-    "SECURITY_KEY": "",
-    "API_URL": ""
+  "pyrus": {
+    "email_auth": "",
+    "security_key": "",
+    "api_url": ""
   },
-  "VK_TEAMS": {
-    "CHANNELS": [
+  "vk_teams": {
+    "channels": [
       "",
       "",
       ""
     ],
-    "TOKEN": "",
-    "URL": "",
-    "NAME": ""
+    "bot_token": "",
+    "api_url": "",
+    "bot_name": ""
   }
 }

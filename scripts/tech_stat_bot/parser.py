@@ -8,7 +8,7 @@ class GetTasksError(Exception):
 
 
 class Parser(Client):
-    def __init__(self, config: dict, catalogs: dict, default_form_id: int | str = '',
+    def __init__(self, config: dict, catalogs: dict, default_form_id: int | str,
                  default_task_fields: dict | None = None) -> None:
         super().__init__(config=config, default_form_id=default_form_id, default_task_fields=default_task_fields)
         try:
