@@ -12,15 +12,5 @@
       "hp_entrances": 7184,
       "all_hp_problems": 6655
     }
-  },
-  "vk_teams": {
-    "channels": [
-      "",
-      "",
-      ""
-    ],
-    "bot_token": "",
-    "api_url": "",
-    "bot_name": ""
   }
 }

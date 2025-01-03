@@ -8,3 +8,4 @@ dist/
 *.spec
 scripts/tech_stat_bot/conf.json
 .idea
+*.json

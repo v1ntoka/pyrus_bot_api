@@ -19,9 +19,9 @@ class Parser(Client):
 
         self.catalog_dict = catalogs
         self.objects_dict = self.__get_catalog_dict(catalogs["hp_objects"])
-        self.tech_problems_dict = self.__get_catalog_dict(catalogs["hp_tech_problems"])
-        self.entrance_dict = self.__get_catalog_dict(catalogs["hp_entrances"])
-        # self.all_problems_dict = self.__get_catalog_dict(catalogs["all_hp_problems"])
+        # self.tech_problems_dict = self.__get_catalog_dict(catalogs["hp_tech_problems"])
+        # self.entrance_dict = self.__get_catalog_dict(catalogs["hp_entrances"])
+        self.all_problems_dict = self.__get_catalog_dict(catalogs["all_hp_problems"])
 
     def __get_catalog_dict(self, cat_id: int) -> dict:
         result = dict()
@@ -41,26 +41,26 @@ class Parser(Client):
                 case 35:
                     result["Object"] = self.objects_dict[
                         field["value"]["item_id"]]
-                case 44:
-                    result["Problem"] = self.tech_problems_dict[
-                        field["value"]["item_id"]]
-                case 45:
-                    result["Entrance"] = self.entrance_dict[
+                case 40:
+                    result["Problem"] = self.all_problems_dict[
                         field["value"]["item_id"]]
                 case _:
                     continue
         return result
 
-    def tech_problems_stat(self) -> pd.DataFrame:
-        data = {"Task_id": [], "Object": [], "Problem": [], "Entrance": []}
+    def tech_problems_stat(self) -> list[dict]:
+        data = []
+        # data = {"Task_id": [], "Object": [], "Problem": []}
         for task in self.form_tasks:
+            line = {}
             try:
                 for key in (tmp := self.__get_tech_line(task)):
-                    data[key].append(tmp[key])
+                    line[key] = tmp[key]
             except KeyError:
                 continue
-        return pd.DataFrame(data)
-
+            data.append(line)
+        # return pd.DataFrame(data)
+        return data
 
 def to_json(task: dict, filename: str = "output") -> None:
     with open("output/" + filename + ".json", 'w', encoding="utf-8") as output:
