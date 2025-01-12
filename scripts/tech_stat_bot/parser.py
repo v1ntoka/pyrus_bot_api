@@ -1,6 +1,5 @@
 from modules.auth import Client
 import json
-import pandas as pd
 
 
 class GetTasksError(Exception):
@@ -19,8 +18,6 @@ class Parser(Client):
 
         self.catalog_dict = catalogs
         self.objects_dict = self.__get_catalog_dict(catalogs["hp_objects"])
-        # self.tech_problems_dict = self.__get_catalog_dict(catalogs["hp_tech_problems"])
-        # self.entrance_dict = self.__get_catalog_dict(catalogs["hp_entrances"])
         self.all_problems_dict = self.__get_catalog_dict(catalogs["all_hp_problems"])
 
     def __get_catalog_dict(self, cat_id: int) -> dict:
@@ -50,7 +47,6 @@ class Parser(Client):
 
     def tech_problems_stat(self) -> list[dict]:
         data = []
-        # data = {"Task_id": [], "Object": [], "Problem": []}
         for task in self.form_tasks:
             line = {}
             try:
@@ -59,7 +55,6 @@ class Parser(Client):
             except KeyError:
                 continue
             data.append(line)
-        # return pd.DataFrame(data)
         return data
 
 def to_json(task: dict, filename: str = "output") -> None:
